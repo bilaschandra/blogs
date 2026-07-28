@@ -3,6 +3,7 @@ export type PostFrontmatter = {
   date: string;
   tags: string[];
   excerpt: string;
+  coverImage?: string;
 };
 
 export type Post = PostFrontmatter & {
