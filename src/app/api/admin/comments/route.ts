@@ -43,15 +43,26 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
 
-  const db = await getDb();
+  let objectId: ObjectId;
+  try {
+    objectId = new ObjectId(id);
+  } catch {
+    return NextResponse.json({ error: "invalid input" }, { status: 400 });
+  }
 
-  if (action === "approve") {
-    await db.collection("comments").updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { approved: true } }
-    );
-  } else {
-    await db.collection("comments").deleteOne({ _id: new ObjectId(id) });
+  try {
+    const db = await getDb();
+
+    if (action === "approve") {
+      await db.collection("comments").updateOne(
+        { _id: objectId },
+        { $set: { approved: true } }
+      );
+    } else {
+      await db.collection("comments").deleteOne({ _id: objectId });
+    }
+  } catch {
+    return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
 
   return NextResponse.json({ status: "ok" });

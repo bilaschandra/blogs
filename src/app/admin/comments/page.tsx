@@ -30,7 +30,7 @@ export default function AdminCommentsPage() {
   }
 
   async function act(id: string, action: "approve" | "reject") {
-    await fetch("/api/admin/comments", {
+    const res = await fetch("/api/admin/comments", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +38,11 @@ export default function AdminCommentsPage() {
       },
       body: JSON.stringify({ id, action }),
     });
-    setComments((prev) => prev.filter((c) => c.id !== id));
+    if (res.ok) {
+      setComments((prev) => prev.filter((c) => c.id !== id));
+    } else {
+      setError(`Failed to ${action} comment`);
+    }
   }
 
   if (!authed) {
@@ -66,6 +70,7 @@ export default function AdminCommentsPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-16">
       <h1 className="text-xl font-bold">Pending comments ({comments.length})</h1>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       <ul className="mt-6 space-y-6">
         {comments.map((c) => (
           <li key={c.id} className="border-b border-gray-200 pb-4 dark:border-gray-800">
