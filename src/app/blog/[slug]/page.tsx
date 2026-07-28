@@ -9,6 +9,12 @@ export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
+export function generateMetadata({ params }: { params: { slug: string } }) {
+  const post = getPostBySlug(params.slug);
+  if (!post) return {};
+  return { title: post.title, description: post.excerpt };
+}
+
 export default function PostPage({ params }: { params: { slug: string } }) {
   const post = getPostBySlug(params.slug);
   if (!post) notFound();
