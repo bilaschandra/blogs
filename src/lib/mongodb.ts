@@ -21,7 +21,22 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = new MongoClient(uri).connect();
 }
 
+let indexesEnsured: Promise<void> | undefined;
+
+async function ensureIndexes(db: Db): Promise<void> {
+  await db
+    .collection("reactions")
+    .createIndex({ slug: 1, emoji: 1 }, { unique: true });
+}
+
 export async function getDb(): Promise<Db> {
   const client = await clientPromise;
-  return client.db();
+  const db = client.db();
+
+  if (!indexesEnsured) {
+    indexesEnsured = ensureIndexes(db);
+  }
+  await indexesEnsured;
+
+  return db;
 }

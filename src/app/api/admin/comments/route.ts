@@ -50,19 +50,15 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
 
-  try {
-    const db = await getDb();
+  const db = await getDb();
 
-    if (action === "approve") {
-      await db.collection("comments").updateOne(
-        { _id: objectId },
-        { $set: { approved: true } }
-      );
-    } else {
-      await db.collection("comments").deleteOne({ _id: objectId });
-    }
-  } catch {
-    return NextResponse.json({ error: "invalid input" }, { status: 400 });
+  if (action === "approve") {
+    await db.collection("comments").updateOne(
+      { _id: objectId },
+      { $set: { approved: true } }
+    );
+  } else {
+    await db.collection("comments").deleteOne({ _id: objectId });
   }
 
   return NextResponse.json({ status: "ok" });
