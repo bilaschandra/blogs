@@ -20,9 +20,9 @@ export function CommentList({ slug, refreshKey }: { slug: string; refreshKey: nu
   return (
     <ul className="mt-4 space-y-4">
       {comments.map((c) => (
-        <li key={c.id} className="border-b border-gray-200 pb-3 dark:border-gray-800">
+        <li key={c.id} className="border-b border-gray-200 pb-3">
           <p className="text-sm font-semibold">{c.name}</p>
-          <p className="text-sm text-gray-700 dark:text-gray-300">{c.text}</p>
+          <p className="text-sm text-gray-700">{c.text}</p>
         </li>
       ))}
     </ul>

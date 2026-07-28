@@ -54,11 +54,11 @@ export default function AdminCommentsPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Admin password"
-          className="mt-4 w-full rounded border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+          className="mt-4 w-full rounded border border-gray-300 px-3 py-2"
         />
         <button
           onClick={login}
-          className="mt-2 rounded bg-gray-900 px-4 py-2 text-sm text-white dark:bg-gray-100 dark:text-gray-900"
+          className="mt-2 rounded bg-uber-black px-4 py-2 text-sm text-white"
         >
           Log in
         </button>
@@ -73,7 +73,7 @@ export default function AdminCommentsPage() {
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       <ul className="mt-6 space-y-6">
         {comments.map((c) => (
-          <li key={c.id} className="border-b border-gray-200 pb-4 dark:border-gray-800">
+          <li key={c.id} className="border-b border-gray-200 pb-4">
             <p className="text-sm text-gray-500">
               {c.slug} — {c.name}
             </p>

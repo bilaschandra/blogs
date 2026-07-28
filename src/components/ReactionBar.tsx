@@ -43,7 +43,7 @@ export function ReactionBar({ slug }: { slug: string }) {
           key={r.emoji}
           onClick={() => react(r.emoji)}
           disabled={clicked.has(r.emoji)}
-          className="flex items-center gap-1 rounded-full border border-gray-300 px-3 py-1 text-sm disabled:opacity-60 dark:border-gray-700"
+          className="flex items-center gap-1 rounded-full border border-gray-300 px-3 py-1 text-sm transition-colors enabled:hover:border-uber-tag-text enabled:hover:text-uber-tag-text disabled:opacity-60"
         >
           <span>{r.emoji}</span>
           <span>{r.count}</span>

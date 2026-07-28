@@ -35,7 +35,7 @@ export function CommentBox({
 
   if (status === "done") {
     return (
-      <p className="mt-4 text-sm text-green-600 dark:text-green-400">
+      <p className="mt-4 text-sm text-green-600">
         Thanks! Your comment is awaiting moderation.
       </p>
     );
@@ -49,7 +49,7 @@ export function CommentBox({
         placeholder="Name"
         required
         maxLength={60}
-        className="w-full rounded border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+        className="w-full rounded border border-gray-300 px-3 py-2"
       />
       <textarea
         value={text}
@@ -58,12 +58,12 @@ export function CommentBox({
         required
         maxLength={2000}
         rows={4}
-        className="w-full rounded border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+        className="w-full rounded border border-gray-300 px-3 py-2"
       />
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="rounded bg-gray-900 px-4 py-2 text-sm text-white disabled:opacity-60 dark:bg-gray-100 dark:text-gray-900"
+        className="rounded bg-uber-black px-4 py-2 text-sm text-white disabled:opacity-60"
       >
         {status === "submitting" ? "Submitting..." : "Submit comment"}
       </button>
