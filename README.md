@@ -66,3 +66,5 @@ Comments submitted on any post are hidden until approved. Visit `/admin/comments
    - `ADMIN_PASSWORD`
    - `NEXT_PUBLIC_SITE_URL` — the assigned `*.vercel.app` URL (update after the first deploy once Vercel assigns it, then redeploy)
 4. Deploy. Verify: home/blog pages render, an emoji reaction persists after reload, a submitted comment stays hidden until approved via `/admin/comments`, and `/rss.xml` / `/sitemap.xml` return valid XML using the real production URL.
+
+Prefer AWS instead? See [docs/deployment-aws-amplify.md](docs/deployment-aws-amplify.md) for the equivalent AWS Amplify Hosting setup (use one host or the other, not both).
