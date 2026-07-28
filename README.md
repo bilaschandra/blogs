@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Engineering Blog
 
-## Getting Started
+A personal engineering blog. Posts are Markdown/MDX files committed to this repo; comments and emoji reactions are the only dynamic features, backed by MongoDB.
 
-First, run the development server:
+## Local setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Copy the env template and fill in real values:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+   - `DATABASE_URL` — for local development, run MongoDB via Docker instead of pointing at production:
+     ```bash
+     docker compose up -d
+     ```
+     Then set `DATABASE_URL="mongodb://127.0.0.1:27017/bilas_mongo_db"` in `.env.local`.
+   - `ADMIN_PASSWORD` — any password you'll use to access `/admin/comments` locally.
+   - `NEXT_PUBLIC_SITE_URL` — `http://localhost:3000` is fine for local dev.
+3. Start the dev server:
+   ```bash
+   npm run dev
+   ```
+
+## Adding a new post
+
+Create a new `.mdx` file in `content/posts/`, e.g. `content/posts/my-new-post.mdx`, with frontmatter:
+
+```mdx
+---
+title: "My New Post"
+date: "2026-08-01"
+tags: ["backend"]
+excerpt: "One-sentence summary shown on listing pages."
+---
+
+Post content here.
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Commit and push — the site picks it up automatically on next deploy (no rebuild step beyond the normal deploy).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Moderating comments
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Comments submitted on any post are hidden until approved. Visit `/admin/comments`, enter the `ADMIN_PASSWORD`, and approve or reject each pending comment. Rejected comments are deleted; approved ones become publicly visible immediately.
 
-## Learn More
+## Deployment (Vercel)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Push this repo to GitHub.
+2. Import it into Vercel ("Add New Project" → select the repo). Framework preset auto-detects Next.js.
+3. In the Vercel project's Settings → Environment Variables, set for Production (and Preview):
+   - `DATABASE_URL` — your MongoDB Atlas connection string (Atlas's Network Access must allow `0.0.0.0/0`, since Vercel's serverless functions don't have static outbound IPs)
+   - `ADMIN_PASSWORD`
+   - `NEXT_PUBLIC_SITE_URL` — the assigned `*.vercel.app` URL (update after the first deploy once Vercel assigns it, then redeploy)
+4. Deploy. Verify: home/blog pages render, an emoji reaction persists after reload, a submitted comment stays hidden until approved via `/admin/comments`, and `/rss.xml` / `/sitemap.xml` return valid XML using the real production URL.
