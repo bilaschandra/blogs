@@ -3,6 +3,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllPosts, getPostBySlug } from "@/lib/posts";
 import { mdxOptions } from "@/lib/mdx";
 import { ReactionBar } from "@/components/ReactionBar";
+import { Comments } from "@/components/Comments";
 
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
@@ -20,6 +21,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
         <MDXRemote source={post.content} options={mdxOptions} />
       </div>
       <ReactionBar slug={post.slug} />
+      <Comments slug={post.slug} />
     </article>
   );
 }
