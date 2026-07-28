@@ -4,25 +4,37 @@ A personal engineering blog. Posts are Markdown/MDX files committed to this repo
 
 ## Local setup
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Copy the env template and fill in real values:
-   ```bash
-   cp .env.local.example .env.local
-   ```
-   - `DATABASE_URL` — for local development, run MongoDB via Docker instead of pointing at production:
-     ```bash
-     docker compose up -d
-     ```
-     Then set `DATABASE_URL="mongodb://127.0.0.1:27017/bilas_mongo_db"` in `.env.local`.
-   - `ADMIN_PASSWORD` — any password you'll use to access `/admin/comments` locally.
-   - `NEXT_PUBLIC_SITE_URL` — `http://localhost:3000` is fine for local dev.
-3. Start the dev server:
-   ```bash
-   npm run dev
-   ```
+First, copy the env template and fill in real values:
+```bash
+cp .env.local.example .env.local
+```
+- `DATABASE_URL` — for local development, point this at Docker's MongoDB rather than production: `mongodb://127.0.0.1:27017/bilas_mongo_db`. (Option A below overrides this automatically for the containerized app — see the note there.)
+- `ADMIN_PASSWORD` — any password you'll use to access `/admin/comments` locally.
+- `NEXT_PUBLIC_SITE_URL` — `http://localhost:3000` is fine for local dev.
+
+Then pick one of the two ways to run it:
+
+### Option A — everything in Docker (app + MongoDB)
+
+```bash
+docker compose up
+```
+
+This starts both the Next.js app (with hot reload — your local files are mounted into the container) and MongoDB, and wires them together automatically. Open **http://localhost:3000**.
+
+- The app reads the rest of `.env.local` (`ADMIN_PASSWORD`, `NEXT_PUBLIC_SITE_URL`) normally, but `docker-compose.yml` overrides `DATABASE_URL` to `mongodb://mongo:27017/bilas_mongo_db` for the app container specifically — inside Docker's network, the Mongo container's hostname is `mongo`, not `127.0.0.1`. You don't need to change anything in `.env.local` for this to work.
+- If port 3000 is already used by something else on your machine, run `APP_PORT=3050 docker compose up` instead (or any free port), and open that port instead.
+- Stop with `Ctrl+C`, or `docker compose down` to also remove the containers (your MongoDB data persists in a Docker volume either way; add `-v` to `docker compose down` to wipe it too).
+
+### Option B — Node on your host, MongoDB in Docker
+
+```bash
+docker compose up -d mongo
+npm install
+npm run dev
+```
+
+Make sure `.env.local`'s `DATABASE_URL` is set to `mongodb://127.0.0.1:27017/bilas_mongo_db` for this option (from your host, Mongo's container is reachable at `127.0.0.1`, not `mongo`). Open **http://localhost:3000**.
 
 ## Adding a new post
 
