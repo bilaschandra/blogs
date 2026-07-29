@@ -53,6 +53,12 @@ Post content here.
 
 Commit and push — the site picks it up automatically on next deploy (no rebuild step beyond the normal deploy).
 
+## Adding a post from the browser (admin CMS)
+
+Instead of hand-writing an `.mdx` file, you can create, edit, and delete posts from `/admin/posts`. This requires a `GITHUB_TOKEN` env var — a GitHub fine-grained personal access token, scoped to just this repo (`bilaschandra/blogs`), with **Contents: Read and write** permission (create one at [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)). Add it to `.env.local` locally and to your host's environment variables in production, same as `DATABASE_URL`/`ADMIN_PASSWORD`.
+
+Publishing this way still goes through git: saving a post commits directly to `main` via GitHub's API, so the public site picks it up after the next automatic rebuild (~1-2 minutes), exactly like editing a `.mdx` file by hand and pushing it yourself.
+
 ## Moderating comments
 
 Comments submitted on any post are hidden until approved. Visit `/admin/comments`, enter the `ADMIN_PASSWORD`, and approve or reject each pending comment. Rejected comments are deleted; approved ones become publicly visible immediately.

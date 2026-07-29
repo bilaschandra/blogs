@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
-
-function isAuthorized(request: NextRequest): boolean {
-  const password = request.headers.get("x-admin-password");
-  return Boolean(password) && password === process.env.ADMIN_PASSWORD;
-}
+import { isAuthorized } from "@/lib/adminAuth";
 
 export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
