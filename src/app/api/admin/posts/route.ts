@@ -8,6 +8,7 @@ import {
   putFile,
   encodeBase64,
   decodeBase64,
+  extensionFromFilename,
   GitHubConflictError,
 } from "@/lib/github";
 
@@ -87,8 +88,7 @@ export async function POST(request: NextRequest) {
   try {
     let coverImage: string | undefined;
     if (coverImageBase64 && coverImageFilename) {
-      const parts = coverImageFilename.split(".");
-      const ext = parts.length > 1 ? parts.pop()!.toLowerCase() : "jpg";
+      const ext = extensionFromFilename(coverImageFilename);
       coverImage = `/images/posts/${slug}.${ext}`;
       await putFile(
         `public/images/posts/${slug}.${ext}`,

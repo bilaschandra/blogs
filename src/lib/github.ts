@@ -21,6 +21,11 @@ export function decodeBase64(base64: string): string {
   return Buffer.from(base64, "base64").toString("utf8");
 }
 
+export function extensionFromFilename(filename: string): string {
+  const parts = filename.split(".");
+  return parts.length > 1 ? parts.pop()!.toLowerCase() : "jpg";
+}
+
 export async function listPostFiles(): Promise<{ name: string; sha: string }[]> {
   const res = await fetch(
     `${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/posts?ref=${BRANCH}`,

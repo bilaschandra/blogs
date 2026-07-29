@@ -7,15 +7,27 @@ import {
   deleteFile,
   encodeBase64,
   decodeBase64,
+  extensionFromFilename,
   GitHubConflictError,
 } from "@/lib/github";
+
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  if (!SLUG_PATTERN.test(params.slug)) {
+    return NextResponse.json({ error: "invalid slug" }, { status: 400 });
+  }
 
-  const file = await getFile(`content/posts/${params.slug}.mdx`).catch(() => null);
+  let file;
+  try {
+    file = await getFile(`content/posts/${params.slug}.mdx`);
+  } catch (err) {
+    console.error("Failed to fetch post:", err);
+    return NextResponse.json({ error: "failed to fetch post" }, { status: 502 });
+  }
   if (!file) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
@@ -35,6 +47,9 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
 export async function PUT(request: NextRequest, { params }: { params: { slug: string } }) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!SLUG_PATTERN.test(params.slug)) {
+    return NextResponse.json({ error: "invalid slug" }, { status: 400 });
   }
 
   const body = await request.json().catch(() => null);
@@ -62,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
     let coverImage = existingCoverImage;
     let ext: string | undefined;
     if (coverImageBase64 && coverImageFilename) {
-      ext = coverImageFilename.split(".").pop()?.toLowerCase() || "jpg";
+      ext = extensionFromFilename(coverImageFilename);
       coverImage = `/images/posts/${params.slug}.${ext}`;
     }
 
@@ -104,6 +119,9 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!SLUG_PATTERN.test(params.slug)) {
+    return NextResponse.json({ error: "invalid slug" }, { status: 400 });
   }
 
   const body = await request.json().catch(() => null);
