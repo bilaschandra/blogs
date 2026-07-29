@@ -60,18 +60,10 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
 
   try {
     let coverImage = existingCoverImage;
+    let ext: string | undefined;
     if (coverImageBase64 && coverImageFilename) {
-      const ext = coverImageFilename.split(".").pop()?.toLowerCase() || "jpg";
+      ext = coverImageFilename.split(".").pop()?.toLowerCase() || "jpg";
       coverImage = `/images/posts/${params.slug}.${ext}`;
-      const existingImageFile = await getFile(`public/images/posts/${params.slug}.${ext}`).catch(
-        () => null
-      );
-      await putFile(
-        `public/images/posts/${params.slug}.${ext}`,
-        coverImageBase64,
-        `Update cover image for ${params.slug}`,
-        existingImageFile?.sha
-      );
     }
 
     const frontmatter: Record<string, unknown> = { title, date, tags, excerpt };
@@ -84,6 +76,18 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
       sha
     );
 
+    if (coverImageBase64 && coverImageFilename && ext) {
+      const existingImageFile = await getFile(`public/images/posts/${params.slug}.${ext}`).catch(
+        () => null
+      );
+      await putFile(
+        `public/images/posts/${params.slug}.${ext}`,
+        coverImageBase64,
+        `Update cover image for ${params.slug}`,
+        existingImageFile?.sha
+      );
+    }
+
     return NextResponse.json({ status: "ok" });
   } catch (err) {
     if (err instanceof GitHubConflictError) {
@@ -92,6 +96,7 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
         { status: 409 }
       );
     }
+    console.error("Failed to update post:", err);
     return NextResponse.json({ error: "failed to update post" }, { status: 502 });
   }
 }
@@ -117,6 +122,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { slug:
         { status: 409 }
       );
     }
+    console.error("Failed to delete post:", err);
     return NextResponse.json({ error: "failed to delete post" }, { status: 502 });
   }
 }
