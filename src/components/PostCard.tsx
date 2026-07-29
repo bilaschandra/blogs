@@ -4,7 +4,7 @@ import type { Post } from "@/lib/types";
 
 export function PostCard({ post }: { post: Post }) {
   return (
-    <article className="border-b border-gray-200 py-6">
+    <article className="flex flex-col">
       <Link href={`/blog/${post.slug}`} className="relative block aspect-video w-full overflow-hidden rounded">
         {post.coverImage ? (
           <Image src={post.coverImage} alt={post.title} fill className="object-cover" />
