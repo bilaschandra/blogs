@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
     const found = posts.filter((p): p is NonNullable<typeof p> => p !== null);
     found.sort((a, b) => (a.date < b.date ? 1 : -1));
     return NextResponse.json(found);
-  } catch {
+  } catch (err) {
+    console.error("Failed to list posts:", err);
     return NextResponse.json({ error: "failed to list posts" }, { status: 502 });
   }
 }
@@ -86,7 +87,8 @@ export async function POST(request: NextRequest) {
   try {
     let coverImage: string | undefined;
     if (coverImageBase64 && coverImageFilename) {
-      const ext = coverImageFilename.split(".").pop()?.toLowerCase() || "jpg";
+      const parts = coverImageFilename.split(".");
+      const ext = parts.length > 1 ? parts.pop()!.toLowerCase() : "jpg";
       coverImage = `/images/posts/${slug}.${ext}`;
       await putFile(
         `public/images/posts/${slug}.${ext}`,
@@ -105,6 +107,7 @@ export async function POST(request: NextRequest) {
     if (err instanceof GitHubConflictError) {
       return NextResponse.json({ error: "conflict creating post, try again" }, { status: 409 });
     }
+    console.error("Failed to create post:", err);
     return NextResponse.json({ error: "failed to create post" }, { status: 502 });
   }
 }
