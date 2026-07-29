@@ -8,11 +8,13 @@ export default function TagPage({ params }: { params: { tag: string } }) {
   return (
     <main>
       <SectionBanner title={`Tag: ${params.tag}`} />
-      <div className="mx-auto max-w-3xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-8">
         {posts.length === 0 && <p className="text-gray-500">No posts yet.</p>}
-        {posts.map((post) => (
-          <PostCard key={post.slug} post={post} />
-        ))}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <PostCard key={post.slug} post={post} />
+          ))}
+        </div>
       </div>
     </main>
   );
