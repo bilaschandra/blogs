@@ -27,6 +27,9 @@ async function ensureIndexes(db: Db): Promise<void> {
   await db
     .collection("reactions")
     .createIndex({ slug: 1, emoji: 1 }, { unique: true });
+  await db.collection("users").createIndex({ username: 1 }, { unique: true });
+  await db.collection("sessions").createIndex({ token: 1 }, { unique: true });
+  await db.collection("sessions").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 }
 
 export async function getDb(): Promise<Db> {
