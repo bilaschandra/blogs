@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import matter from "gray-matter";
-import { isAuthorized } from "@/lib/adminAuth";
+import { getSessionUser } from "@/lib/adminAuth";
 import {
   getFile,
   putFile,
@@ -14,7 +14,8 @@ import {
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   if (!SLUG_PATTERN.test(params.slug)) {
@@ -45,7 +46,8 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { slug: string } }) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   if (!SLUG_PATTERN.test(params.slug)) {
@@ -117,7 +119,8 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   if (!SLUG_PATTERN.test(params.slug)) {
