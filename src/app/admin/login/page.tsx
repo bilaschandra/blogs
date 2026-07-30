@@ -4,10 +4,17 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.includes("://")) {
-    return "/admin/posts";
+  const fallback = "/admin/posts";
+  if (!raw) return fallback;
+  try {
+    const resolved = new URL(raw, "http://internal-safe-next-check.invalid");
+    if (resolved.origin !== "http://internal-safe-next-check.invalid") {
+      return fallback;
+    }
+    return resolved.pathname + resolved.search + resolved.hash;
+  } catch {
+    return fallback;
   }
-  return raw;
 }
 
 function LoginForm() {
