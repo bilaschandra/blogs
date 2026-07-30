@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "create-admin": "tsx scripts/create-admin.mjs"
+    "create-admin": "node --env-file=.env.local ./node_modules/.bin/tsx scripts/create-admin.mjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

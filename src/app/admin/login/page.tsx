@@ -3,6 +3,13 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.includes("://")) {
+    return "/admin/posts";
+  }
+  return raw;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,7 +30,7 @@ function LoginForm() {
     });
 
     if (res.ok) {
-      const next = searchParams.get("next") || "/admin/posts";
+      const next = safeNextPath(searchParams.get("next"));
       router.push(next);
     } else {
       const data = await res.json().catch(() => ({}));
