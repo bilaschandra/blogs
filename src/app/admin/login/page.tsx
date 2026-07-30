@@ -11,6 +11,9 @@ function safeNextPath(raw: string | null): string {
     if (resolved.origin !== "http://internal-safe-next-check.invalid") {
       return fallback;
     }
+    if (resolved.pathname.startsWith("//")) {
+      return fallback;
+    }
     return resolved.pathname + resolved.search + resolved.hash;
   } catch {
     return fallback;
