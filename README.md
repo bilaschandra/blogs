@@ -9,7 +9,6 @@ First, copy the env template and fill in real values:
 cp .env.local.example .env.local
 ```
 - `DATABASE_URL` — for local development, point this at Docker's MongoDB rather than production: `mongodb://127.0.0.1:27017/bilas_mongo_db`. (Option A below overrides this automatically for the containerized app — see the note there.)
-- `ADMIN_PASSWORD` — any password you'll use to access `/admin/comments` locally.
 - `NEXT_PUBLIC_SITE_URL` — `http://localhost:3000` is fine for local dev.
 
 Then pick one of the two ways to run it:
@@ -22,7 +21,7 @@ docker compose up
 
 This starts both the Next.js app (with hot reload — your local files are mounted into the container) and MongoDB, and wires them together automatically. Open **http://localhost:3000**.
 
-- The app reads the rest of `.env.local` (`ADMIN_PASSWORD`, `NEXT_PUBLIC_SITE_URL`) normally, but `docker-compose.yml` overrides `DATABASE_URL` to `mongodb://mongo:27017/bilas_mongo_db` for the app container specifically — inside Docker's network, the Mongo container's hostname is `mongo`, not `127.0.0.1`. You don't need to change anything in `.env.local` for this to work.
+- The app reads the rest of `.env.local` (`NEXT_PUBLIC_SITE_URL`) normally, but `docker-compose.yml` overrides `DATABASE_URL` to `mongodb://mongo:27017/bilas_mongo_db` for the app container specifically — inside Docker's network, the Mongo container's hostname is `mongo`, not `127.0.0.1`. You don't need to change anything in `.env.local` for this to work.
 - If port 3000 is already used by something else on your machine, run `APP_PORT=3050 docker compose up` instead (or any free port), and open that port instead.
 - Stop with `Ctrl+C`, or `docker compose down` to also remove the containers (your MongoDB data persists in a Docker volume either way; add `-v` to `docker compose down` to wipe it too).
 
@@ -55,13 +54,28 @@ Commit and push — the site picks it up automatically on next deploy (no rebuil
 
 ## Adding a post from the browser (admin CMS)
 
-Instead of hand-writing an `.mdx` file, you can create, edit, and delete posts from `/admin/posts`. This requires a `GITHUB_TOKEN` env var — a GitHub fine-grained personal access token, scoped to just this repo (`bilaschandra/blogs`), with **Contents: Read and write** permission (create one at [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)). Add it to `.env.local` locally and to your host's environment variables in production, same as `DATABASE_URL`/`ADMIN_PASSWORD`.
+Instead of hand-writing an `.mdx` file, you can create, edit, and delete posts from `/admin/posts`. This requires a `GITHUB_TOKEN` env var — a GitHub fine-grained personal access token, scoped to just this repo (`bilaschandra/blogs`), with **Contents: Read and write** permission (create one at [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)). Add it to `.env.local` locally and to your host's environment variables in production, same as `DATABASE_URL`.
 
 Publishing this way still goes through git: saving a post commits directly to `main` via GitHub's API, so the public site picks it up after the next automatic rebuild (~1-2 minutes), exactly like editing a `.mdx` file by hand and pushing it yourself.
 
 ## Moderating comments
 
-Comments submitted on any post are hidden until approved. Visit `/admin/comments`, enter the `ADMIN_PASSWORD`, and approve or reject each pending comment. Rejected comments are deleted; approved ones become publicly visible immediately.
+Comments submitted on any post are hidden until approved. Visit `/admin/comments` (logged in as an `admin` account) and approve or reject each pending comment. Rejected comments are deleted; approved ones become publicly visible immediately.
+
+## Admin login and managing users
+
+Every `/admin/*` page requires logging in at `/admin/login` with a real username and password (there's also an "Admin" link in the site footer). Accounts have one of two roles:
+
+- **`author`** — can create, edit, and delete posts via `/admin/posts`.
+- **`admin`** — everything an author can do, plus moderate comments (`/admin/comments`) and manage user accounts (`/admin/users`).
+
+There's no public signup. To create the very first account (or any account without going through the UI), run:
+
+```bash
+npm run create-admin -- --username=<username> --password=<password> --displayName="<Full Name>" --role=admin
+```
+
+Once at least one admin account exists, further accounts can be created from `/admin/users` while logged in as an admin.
 
 ## Deployment (Vercel)
 
@@ -69,7 +83,6 @@ Comments submitted on any post are hidden until approved. Visit `/admin/comments
 2. Import it into Vercel ("Add New Project" → select the repo). Framework preset auto-detects Next.js.
 3. In the Vercel project's Settings → Environment Variables, set for Production (and Preview):
    - `DATABASE_URL` — your MongoDB Atlas connection string (Atlas's Network Access must allow `0.0.0.0/0`, since Vercel's serverless functions don't have static outbound IPs)
-   - `ADMIN_PASSWORD`
    - `NEXT_PUBLIC_SITE_URL` — the assigned `*.vercel.app` URL (update after the first deploy once Vercel assigns it, then redeploy)
 4. Deploy. Verify: home/blog pages render, an emoji reaction persists after reload, a submitted comment stays hidden until approved via `/admin/comments`, and `/rss.xml` / `/sitemap.xml` return valid XML using the real production URL.
 
