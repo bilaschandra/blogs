@@ -20,7 +20,6 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 export function PostForm({
-  password,
   mode,
   slug,
   initial,
@@ -28,7 +27,6 @@ export function PostForm({
   existingCoverImage,
   onSaved,
 }: {
-  password: string;
   mode: "create" | "edit";
   slug?: string;
   initial?: PostFormValues;
@@ -72,7 +70,7 @@ export function PostForm({
 
     const res = await fetch(url, {
       method,
-      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 

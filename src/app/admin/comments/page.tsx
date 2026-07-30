@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAdminSession } from "@/lib/useAdminSession";
 
 type PendingComment = {
   id: string;
@@ -11,31 +12,21 @@ type PendingComment = {
 };
 
 export default function AdminCommentsPage() {
-  const [password, setPassword] = useState("");
-  const [authed, setAuthed] = useState(false);
+  const { user, loading } = useAdminSession();
   const [comments, setComments] = useState<PendingComment[]>([]);
   const [error, setError] = useState("");
 
-  async function login() {
-    const res = await fetch("/api/admin/comments", {
-      headers: { "x-admin-password": password },
+  useEffect(() => {
+    if (!user || user.role !== "admin") return;
+    fetch("/api/admin/comments").then(async (res) => {
+      if (res.ok) setComments(await res.json());
     });
-    if (res.ok) {
-      setAuthed(true);
-      setError("");
-      setComments(await res.json());
-    } else {
-      setError("Wrong password");
-    }
-  }
+  }, [user]);
 
   async function act(id: string, action: "approve" | "reject") {
     const res = await fetch("/api/admin/comments", {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-password": password,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, action }),
     });
     if (res.ok) {
@@ -45,31 +36,29 @@ export default function AdminCommentsPage() {
     }
   }
 
-  if (!authed) {
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/admin/login";
+  }
+
+  if (loading || !user) return null;
+
+  if (user.role !== "admin") {
     return (
       <main className="mx-auto max-w-md px-4 py-16">
-        <h1 className="text-xl font-bold">Admin login</h1>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Admin password"
-          className="mt-4 w-full rounded border border-gray-300 px-3 py-2"
-        />
-        <button
-          onClick={login}
-          className="mt-2 rounded bg-uber-black px-4 py-2 text-sm text-white"
-        >
-          Log in
-        </button>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        <p>You don&apos;t have access to this page.</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-16">
-      <h1 className="text-xl font-bold">Pending comments ({comments.length})</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">Pending comments ({comments.length})</h1>
+        <button onClick={logout} className="text-sm text-gray-500 underline">
+          Log out
+        </button>
+      </div>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       <ul className="mt-6 space-y-6">
         {comments.map((c) => (

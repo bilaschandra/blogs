@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create-admin": "node --env-file=.env.local ./node_modules/.bin/tsx scripts/create-admin.mjs"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "gray-matter": "^4.0.3",
     "mongodb": "^7.5.0",
     "next": "^14.2.35",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.20",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

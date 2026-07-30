@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
-import { isAuthorized } from "@/lib/adminAuth";
+import { getSessionUser } from "@/lib/adminAuth";
 
 export async function GET(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (user.role !== "admin") {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
   const db = await getDb();
@@ -27,8 +31,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (user.role !== "admin") {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null);

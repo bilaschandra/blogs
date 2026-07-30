@@ -52,23 +52,34 @@ In the app's **Environment variables** settings (before the first deploy, or any
 | Key | Value |
 |---|---|
 | `DATABASE_URL` | Your real MongoDB Atlas connection string |
-| `ADMIN_PASSWORD` | A real, strong password (not the placeholder from local dev) |
 | `NEXT_PUBLIC_SITE_URL` | The domain Amplify assigns after first deploy, e.g. `https://main.xxxxxxxxxxxx.amplifyapp.com` (update this and redeploy once you know it, same as the Vercel flow) |
+
+No `ADMIN_PASSWORD` env var is needed — admin accounts are real username/password accounts stored in MongoDB (see "Create the first admin account" below).
 
 ## Step 4: MongoDB Atlas network access
 
 Same requirement as Vercel: in Atlas → **Network Access**, allow `0.0.0.0/0`. AWS Amplify's SSR compute (like Vercel's serverless functions) doesn't have static outbound IPs, so Atlas has to accept connections from any IP — your data stays protected by the connection string's username/password, not by IP restriction.
 
-## Step 5: Deploy and verify
+## Step 5: Create the first admin account
+
+There's no public signup and no `ADMIN_PASSWORD` env var — admin accounts are real username/password accounts stored in MongoDB. To create the first one, run this locally with `DATABASE_URL` pointed at the same MongoDB Atlas database Amplify uses:
+
+```bash
+DATABASE_URL="<your Atlas connection string>" npm run create-admin -- --username=<username> --password=<password> --displayName="<Full Name>" --role=admin
+```
+
+Once at least one admin account exists, further accounts can be created from `/admin/users` while logged in as an admin. Log in at `/admin/login` with the username/password you just created.
+
+## Step 6: Deploy and verify
 
 Amplify deploys automatically once you save the settings above. After it finishes:
 
 1. Home/blog pages render, cards show the black cover-image fallback (until you add real images).
 2. Clicking an emoji reaction persists after reload (confirms the app reaches MongoDB Atlas).
-3. Submitting a comment shows "awaiting moderation"; `/admin/comments` with the real `ADMIN_PASSWORD` shows it pending; approving makes it public.
+3. Submitting a comment shows "awaiting moderation"; logging in at `/admin/login` with the admin account created in Step 5 and visiting `/admin/comments` shows it pending; approving makes it public.
 4. `/rss.xml` and `/sitemap.xml` return valid XML using the real Amplify domain.
 
-## Step 6 (optional): Custom domain
+## Step 7 (optional): Custom domain
 
 In the app's **Domain management** settings, add your own domain and follow Amplify's DNS verification steps (it provisions an SSL certificate automatically). Update `NEXT_PUBLIC_SITE_URL` to match and redeploy.
 

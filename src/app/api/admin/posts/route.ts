@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import matter from "gray-matter";
-import { isAuthorized } from "@/lib/adminAuth";
+import { getSessionUser } from "@/lib/adminAuth";
 import { slugify } from "@/lib/slugify";
 import {
   listPostFiles,
@@ -13,7 +13,8 @@ import {
 } from "@/lib/github";
 
 export async function GET(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -43,7 +44,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  const user = await getSessionUser(request);
+  if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
