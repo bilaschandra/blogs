@@ -59,13 +59,22 @@ export async function POST(request: NextRequest) {
   }
 
   const passwordHash = await hashPassword(password);
-  await db.collection("users").insertOne({
-    username,
-    passwordHash,
-    displayName,
-    role,
-    createdAt: new Date(),
-  });
+  try {
+    await db.collection("users").insertOne({
+      username,
+      passwordHash,
+      displayName,
+      role,
+      createdAt: new Date(),
+    });
+  } catch (error) {
+    // Handle MongoDB duplicate-key error that can occur in race conditions
+    if (error instanceof Error && "code" in error && error.code === 11000) {
+      return NextResponse.json({ error: "username already taken" }, { status: 400 });
+    }
+    // Re-throw any other error
+    throw error;
+  }
 
   return NextResponse.json({ status: "ok" }, { status: 201 });
 }
