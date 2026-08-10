@@ -16,12 +16,3 @@ export type Paginated<T> = {
   currentPage: number;
   totalPages: number;
 };
-
-export type UserRole = "admin" | "author";
-
-export type SessionUser = {
-  userId: string;
-  username: string;
-  displayName: string;
-  role: UserRole;
-};

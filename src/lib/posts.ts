@@ -1,26 +1,54 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import type { Post, PostFrontmatter, Paginated } from "./types";
+import type { Post, Paginated } from "./types";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
+const POST_EXTENSIONS = [".md", ".mdx"];
 
 function getPostSlugs(): string[] {
   return fs
     .readdirSync(POSTS_DIR)
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => file.replace(/\.mdx$/, ""));
+    .filter((file) => POST_EXTENSIONS.includes(path.extname(file)))
+    .map((file) => file.replace(/\.mdx?$/, ""));
+}
+
+function resolvePostPath(slug: string): string | null {
+  for (const ext of POST_EXTENSIONS) {
+    const filePath = path.join(POSTS_DIR, `${slug}${ext}`);
+    if (fs.existsSync(filePath)) return filePath;
+  }
+  return null;
+}
+
+function toDateString(value: unknown): string {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value ?? "");
+}
+
+function toExcerpt(data: Record<string, unknown>, content: string): string {
+  if (typeof data.excerpt === "string") return data.excerpt;
+  if (typeof data.description === "string") return data.description;
+  const text = content.replace(/[#>*`_-]/g, " ").replace(/\s+/g, " ").trim();
+  return text.length > 160 ? `${text.slice(0, 157)}...` : text;
 }
 
 export function getPostBySlug(slug: string): Post | null {
-  const filePath = path.join(POSTS_DIR, `${slug}.mdx`);
-  if (!fs.existsSync(filePath)) return null;
+  const filePath = resolvePostPath(slug);
+  if (!filePath) return null;
 
   const raw = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(raw);
-  const frontmatter = data as PostFrontmatter;
 
-  return { slug, content, ...frontmatter };
+  return {
+    slug,
+    content,
+    title: typeof data.title === "string" ? data.title : slug,
+    date: toDateString(data.date),
+    tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
+    excerpt: toExcerpt(data, content),
+    coverImage: typeof data.coverImage === "string" ? data.coverImage : undefined,
+  };
 }
 
 export function getAllPosts(): Post[] {
