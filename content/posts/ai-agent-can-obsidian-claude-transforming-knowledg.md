@@ -3,10 +3,8 @@ title: "AI Agent Can Read: Obsidian + Claude – Transforming Knowledge Manageme
 description: "AI-powered note analysis with Obsidian and Claude transforms knowledge management."
 date: 2026-08-11
 tags: ["AI Tools", "Knowledge Management", "Obsidian", "Claude AI", "Note Analysis"]
+coverImage: "/images/posts/ai-agent-can-obsidian-claude-transforming-knowledg.jpg"
 ---
-
-
-![Featured Image](/images/posts/ai-agent-can-obsidian-claude-transforming-knowledg.jpg)
 
 # AI Agent Can Read: Obsidian + Claude – Transforming Knowledge Management with AI-Powered Note Analysis  
 

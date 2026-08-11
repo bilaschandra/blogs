@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Post } from "@/lib/types";
 
+const MAX_VISIBLE_TAGS = 3;
+
 export function PostCard({ post }: { post: Post }) {
   return (
     <article className="flex flex-col">
@@ -12,8 +14,8 @@ export function PostCard({ post }: { post: Post }) {
           <div className="h-full w-full bg-uber-black" />
         )}
       </Link>
-      <div className="mt-3 flex gap-2">
-        {post.tags.map((tag) => (
+      <div className="mt-3 flex flex-wrap gap-2">
+        {post.tags.slice(0, MAX_VISIBLE_TAGS).map((tag) => (
           <Link
             key={tag}
             href={`/tags/${tag}`}
@@ -22,6 +24,14 @@ export function PostCard({ post }: { post: Post }) {
             {tag}
           </Link>
         ))}
+        {post.tags.length > MAX_VISIBLE_TAGS && (
+          <Link
+            href={`/blog/${post.slug}`}
+            className="rounded bg-uber-tag-bg px-2 py-0.5 text-xs font-semibold text-uber-tag-text"
+          >
+            +{post.tags.length - MAX_VISIBLE_TAGS}
+          </Link>
+        )}
       </div>
       <Link
         href={`/blog/${post.slug}`}

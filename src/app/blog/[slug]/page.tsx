@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllPosts, getPostBySlug } from "@/lib/posts";
 import { mdxOptions } from "@/lib/mdx";
@@ -23,6 +24,19 @@ export default function PostPage({ params }: { params: { slug: string } }) {
       <div className="mx-auto max-w-3xl px-4 pt-16 text-center">
         <p className="text-sm text-uber-gray">{post.date}</p>
         <h1 className="mt-2 font-heading text-4xl font-bold text-black">{post.title}</h1>
+        {post.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {post.tags.map((tag) => (
+              <Link
+                key={tag}
+                href={`/tags/${tag}`}
+                className="rounded bg-uber-tag-bg px-2 py-0.5 text-xs font-semibold text-uber-tag-text"
+              >
+                {tag}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
       <div className="relative mx-auto mt-8 aspect-video w-full max-w-3xl overflow-hidden rounded">
         {post.coverImage ? (
